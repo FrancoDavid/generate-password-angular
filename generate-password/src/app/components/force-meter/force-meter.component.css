@@ -1,0 +1,38 @@
+aside {
+  background-color: black;
+
+  padding: 16px 8px;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+
+aside p {
+  color: dimgray;
+
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+
+aside div {
+  display: flex;
+  justify-content: center;
+}
+
+aside div p {
+  color: white;
+  font-size: 2rem;
+}
+
+.force-params {
+  border:  2px solid white;
+  padding: 4px;
+  margin: 0 4px;
+}
+
+.force-filled {
+  background-color: orange;
+}
+

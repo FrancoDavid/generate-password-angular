@@ -1,0 +1,47 @@
+.params-description {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 1.6rem;
+}
+
+.params-slider {
+    margin: 16px 0;
+}
+
+.params-slider input {
+    width: 100%;
+}
+
+.params-checkbox div {
+    text-align: left;
+    margin: 12px auto;
+    font-size: 1.6rem;
+}
+
+.params-footer {
+    margin: 16px 0;
+   
+}
+
+.params-footer button {
+    width: 100%;
+    padding: 16px;
+
+    font-size: 1.8rem;
+    font-weight: 300;
+    font-family: 'Saira Condensed', sans-serif;
+
+    color: black;
+    background-color:darkseagreen;
+
+    border: 1px solid #8fbc8f;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.params-footer button img {
+    margin-left: 10px;
+}

@@ -1,0 +1,11 @@
+main {
+  text-align: center;
+  margin : 0 auto;
+  padding: 4px;
+}
+
+main h1 {
+  color: grey;
+  margin-bottom: 20px;
+  font-weight: 300;
+}
