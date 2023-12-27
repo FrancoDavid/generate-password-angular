@@ -38,7 +38,7 @@ export class ForceMeterComponent implements OnChanges {
     constructor() {
         this.level = 'NONE';
         this.params = {
-            characterLength: 0,
+            characterLength: 1,
             includedUppercase: false,
             includedLowercase: false,
             includedNumber: false,
@@ -46,8 +46,7 @@ export class ForceMeterComponent implements OnChanges {
         };
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        console.log('changes', changes);
+    ngOnChanges(): void {
         this._setLevel();
     }
 
@@ -55,19 +54,23 @@ export class ForceMeterComponent implements OnChanges {
 
         const countParamsActive = this._countersParams();
 
-        if ((this.params.characterLength >= 0 && this.params.characterLength <= 6)) {
-            this.level = 'WEAK';
+        if ((this.params.characterLength < 6)) {
+            this.level = (countParamsActive <= 1) ? 'WEAK': 'MEDIUM';
+
         } else if ((this.params.characterLength > 6 && this.params.characterLength <= 15)) {
-            this.level = 'MEDIUM';
+            this.level = (countParamsActive <= 2) ? 'MEDIUM': 'STRONG';
+
         } else if ((this.params.characterLength > 15 && this.params.characterLength <= 25)) {
-            this.level = 'STRONG';
-        } else if (this.params.characterLength > 25) {
-            this.level = 'EXTREME';
+            this.level = (countParamsActive <= 3) ? 'STRONG' : 'EXTREME';
+            
+        } else if (this.params.characterLength > 25) {            
+            this.level = "EXTREME";
+
         } else {
             this.level = 'NONE';
+
         }
     }
-
 
     private _countersParams(): number {
         return Object.keys(this.params).filter((key) => {
@@ -86,6 +89,5 @@ export class ForceMeterComponent implements OnChanges {
         
         }).length;
     }
-
-
+    
 }

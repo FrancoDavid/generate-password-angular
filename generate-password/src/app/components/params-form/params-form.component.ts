@@ -18,8 +18,7 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
                     <input
                         type="range"
                         min="0"
-                        max="50"
-                        step="5"
+                        max="30"
                         formControlName="characterLength">
                 </aside>
                 
@@ -87,14 +86,14 @@ export class ParamsFormComponent implements OnInit {
 
     constructor(private _formBuilder: FormBuilder) {
         this.generatorForm = this._formBuilder.group({
-            characterLength: [0],
+            characterLength: [1],
             includedUppercase: [false],
             includedLowercase: [false],
             includedNumber: [false],
             includedSymbols: [false]
         });
         this.values = {
-            characterLength: 0,
+            characterLength: 1,
             includedUppercase: false,
             includedLowercase: false,
             includedNumber: false,
