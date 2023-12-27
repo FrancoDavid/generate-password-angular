@@ -39,7 +39,7 @@ export class ForceMeterComponent implements OnChanges {
         this.level = 'NONE';
         this.params = {
             characterLength: 1,
-            includedUppercase: false,
+            includedUppercase: true,
             includedLowercase: false,
             includedNumber: false,
             includedSymbols: false

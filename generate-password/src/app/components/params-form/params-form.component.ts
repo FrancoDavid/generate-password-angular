@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ForceMeterComponent } from "../force-meter/force-meter.component";
-import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
     selector: 'params-form',
@@ -20,6 +20,9 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
                         min="0"
                         max="30"
                         formControlName="characterLength">
+                    <small *ngIf="isSubmitted && controls['characterLength'].errors">
+                        the length of the characters is required.
+                    </small>
                 </aside>
                 
                 <aside class="params-checkbox">
@@ -47,6 +50,10 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
                             Include Symbols
                         </label>
                     </div>
+
+                    <small *ngIf="isSubmitted && generatorForm.errors">
+                        at least one option must be selected
+                    </small>
                 </aside>
 
                 <force-meter
@@ -54,7 +61,7 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
                 </force-meter>
 
                 <aside class="params-footer">
-                    <button>
+                    <button (click)="onGenerate()">
                         GENERATE 
                         <img
                             src="./../../../assets/icons/arrow-right-svgrepo-com.svg"
@@ -75,6 +82,8 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
 })
 export class ParamsFormComponent implements OnInit {
 
+    @Output() eventGenerated: EventEmitter<string>;
+
     public generatorForm: FormGroup;
     public values: {
         characterLength: number;
@@ -83,22 +92,28 @@ export class ParamsFormComponent implements OnInit {
         includedNumber: boolean;
         includedSymbols: boolean;
     };
+    public isSubmitted: boolean;
 
     constructor(private _formBuilder: FormBuilder) {
         this.generatorForm = this._formBuilder.group({
-            characterLength: [1],
-            includedUppercase: [false],
+            characterLength: [0, Validators.min(1)],
+            includedUppercase: [true],
             includedLowercase: [false],
             includedNumber: [false],
             includedSymbols: [false]
+        }, {
+            validator: this._validationAtLeastOneSelected
         });
         this.values = {
             characterLength: 1,
-            includedUppercase: false,
+            includedUppercase: true,
             includedLowercase: false,
             includedNumber: false,
             includedSymbols: false
         };
+        this.isSubmitted = false;
+
+        this.eventGenerated = new EventEmitter();
     }
 
     public get controls(): { [key: string]: AbstractControl} {
@@ -109,6 +124,69 @@ export class ParamsFormComponent implements OnInit {
         this.generatorForm.valueChanges.subscribe((value) => {
             this.values = {...value};
         });
+    }
+
+    public onGenerate(): void {
+
+        this.isSubmitted = true;
+
+        if (this.generatorForm.invalid) {
+            return;
+        }
+        
+        const charactersUppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const charactersLowercase = "abcdefghijklmnopqrstuvwxyz";
+        const charactersNumber = "0123456789";
+        const charactersSymbols = "!@#$%^&*()_-+=<>?";
+        
+        const length = this.controls['characterLength'].value;
+        const checkUppercase = this.controls['includedUppercase'].value;
+        const checkLowercase = this.controls['includedLowercase'].value;
+        const checkNumber = this.controls['includedNumber'].value;
+        const checkSymbols = this.controls['includedSymbols'].value;    
+        
+        let characterFinal = "";
+        let password = '';
+
+
+        if (checkUppercase) {
+            characterFinal += charactersUppercase;
+        }
+
+        if (checkLowercase) {
+            characterFinal += charactersLowercase;
+        }
+
+        if (checkNumber) {
+            characterFinal += charactersNumber;
+        }
+
+        if (checkSymbols) {
+            characterFinal += charactersSymbols;
+        }
+
+        
+        for (let i = 0; i < length; i++) {
+            const indexRandom = Math.floor(Math.random() * characterFinal.length);
+            password += characterFinal.charAt(indexRandom);
+        }
+
+        console.log(password);
+        this.eventGenerated.emit(password);
+    }
+
+    private _validationAtLeastOneSelected(formGroup: FormGroup): { atLeastOneSelected: boolean } | null {
+        
+        const checkUppercase = formGroup.get('includedUppercase')?.value;
+        const checkLowercase = formGroup.get('includedLowercase')?.value;
+        const checkNumber = formGroup.get('includedNumber')?.value;
+        const checkSymbols = formGroup.get('includedSymbols')?.value;
+        
+        if (!checkUppercase && !checkLowercase && !checkNumber && !checkSymbols) {
+            return { atLeastOneSelected: true };
+        }
+
+        return null;
     }
 
 }

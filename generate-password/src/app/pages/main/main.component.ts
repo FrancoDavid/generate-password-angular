@@ -6,10 +6,26 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     template: `
         <main>
             <h1>Password Generator</h1>
-            <password-viewer></password-viewer>
-            <params-form></params-form>
+            <password-viewer
+                [value]="passwordValue">
+            </password-viewer>
+            <params-form
+                (eventGenerated)="onGeneratePassword($event)">
+            </params-form>
         </main>
     `,
     styleUrls: ['./main.component.css'],
 })
-export class MainComponent { }
+export class MainComponent {
+
+    public passwordValue: string;
+
+    constructor() {
+        this.passwordValue = '';
+    }
+
+    public onGeneratePassword(event: string): void {
+        this.passwordValue = event;
+    }
+
+}
