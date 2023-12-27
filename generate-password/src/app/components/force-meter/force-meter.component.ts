@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AbstractControl, FormGroup } from '@angular/forms';
 
 @Component({
     selector: 'force-meter',
@@ -11,15 +12,80 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
         <aside class="force-container">
             <p>STRENGTH</p>
             <div>
-                <p>MEDIUM</p>
-                <div class="force-params force-filled"></div>
-                <div class="force-params"></div>
-                <div class="force-params"></div>
-                <div class="force-params"></div>
+                <p *ngIf="level != 'NONE'">{{level}}</p>
+                <div class="force-params" [ngClass]="{'force-filled': level !== 'NONE'}"></div>
+                <div class="force-params" [ngClass]="{'force-filled': level !== 'NONE' && level !== 'WEAK'}"></div>
+                <div class="force-params" [ngClass]="{'force-filled': level === 'STRONG' || level === 'EXTREME'}"></div>
+                <div class="force-params" [ngClass]="{'force-filled': level === 'EXTREME'}"></div>
             </div>
         </aside>
     `,
     styleUrls: ['./force-meter.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ForceMeterComponent { }
+export class ForceMeterComponent implements OnChanges {
+    
+    @Input() params: {
+        characterLength: number;
+        includedUppercase: boolean;
+        includedLowercase: boolean;
+        includedNumber: boolean;
+        includedSymbols: boolean;
+    };
+
+    public level: 'NONE' | 'WEAK' | 'MEDIUM' | 'STRONG' | 'EXTREME';
+
+    constructor() {
+        this.level = 'NONE';
+        this.params = {
+            characterLength: 0,
+            includedUppercase: false,
+            includedLowercase: false,
+            includedNumber: false,
+            includedSymbols: false
+        };
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        console.log('changes', changes);
+        this._setLevel();
+    }
+
+    private _setLevel(): void {
+
+        const countParamsActive = this._countersParams();
+
+        if ((this.params.characterLength >= 0 && this.params.characterLength <= 6)) {
+            this.level = 'WEAK';
+        } else if ((this.params.characterLength > 6 && this.params.characterLength <= 15)) {
+            this.level = 'MEDIUM';
+        } else if ((this.params.characterLength > 15 && this.params.characterLength <= 25)) {
+            this.level = 'STRONG';
+        } else if (this.params.characterLength > 25) {
+            this.level = 'EXTREME';
+        } else {
+            this.level = 'NONE';
+        }
+    }
+
+
+    private _countersParams(): number {
+        return Object.keys(this.params).filter((key) => {
+        
+            if (key !== 'characterLength') {
+                return (this.params[key as keyof {
+                    characterLength: number;
+                    includedUppercase: boolean;
+                    includedLowercase: boolean;
+                    includedNumber: boolean;
+                    includedSymbols: boolean;
+                }]);
+            }
+
+            return false;
+        
+        }).length;
+    }
+
+
+}
