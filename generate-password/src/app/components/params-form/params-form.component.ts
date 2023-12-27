@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ForceMeterComponent } from "../force-meter/force-meter.component";
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { GeneratorService } from 'src/app/services/generator.service';
 
 @Component({
     selector: 'params-form',
@@ -11,7 +12,7 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
             <form [formGroup]="generatorForm">
                 <aside class="params-description">
                     <p>Character Length</p>
-                    <p>{{controls['characterLength'].value}}</p>
+                    <strong>{{controls['characterLength'].value}}</strong>
                 </aside>
                 
                 <aside class="params-slider">
@@ -78,6 +79,9 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
         FormsModule,
         ReactiveFormsModule,
         ForceMeterComponent
+    ],
+    providers: [
+        GeneratorService
     ]
 })
 export class ParamsFormComponent implements OnInit {
@@ -94,9 +98,10 @@ export class ParamsFormComponent implements OnInit {
     };
     public isSubmitted: boolean;
 
-    constructor(private _formBuilder: FormBuilder) {
+    constructor(private _formBuilder: FormBuilder,
+                private _generatorService: GeneratorService) {
         this.generatorForm = this._formBuilder.group({
-            characterLength: [0, Validators.min(1)],
+            characterLength: [1, Validators.min(1)],
             includedUppercase: [true],
             includedLowercase: [false],
             includedNumber: [false],
@@ -133,46 +138,10 @@ export class ParamsFormComponent implements OnInit {
         if (this.generatorForm.invalid) {
             return;
         }
+
+        const resultPassword = this._generatorService.generatePassword(this.controls);
         
-        const charactersUppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const charactersLowercase = "abcdefghijklmnopqrstuvwxyz";
-        const charactersNumber = "0123456789";
-        const charactersSymbols = "!@#$%^&*()_-+=<>?";
-        
-        const length = this.controls['characterLength'].value;
-        const checkUppercase = this.controls['includedUppercase'].value;
-        const checkLowercase = this.controls['includedLowercase'].value;
-        const checkNumber = this.controls['includedNumber'].value;
-        const checkSymbols = this.controls['includedSymbols'].value;    
-        
-        let characterFinal = "";
-        let password = '';
-
-
-        if (checkUppercase) {
-            characterFinal += charactersUppercase;
-        }
-
-        if (checkLowercase) {
-            characterFinal += charactersLowercase;
-        }
-
-        if (checkNumber) {
-            characterFinal += charactersNumber;
-        }
-
-        if (checkSymbols) {
-            characterFinal += charactersSymbols;
-        }
-
-        
-        for (let i = 0; i < length; i++) {
-            const indexRandom = Math.floor(Math.random() * characterFinal.length);
-            password += characterFinal.charAt(indexRandom);
-        }
-
-        console.log(password);
-        this.eventGenerated.emit(password);
+        this.eventGenerated.emit(resultPassword);
     }
 
     private _validationAtLeastOneSelected(formGroup: FormGroup): { atLeastOneSelected: boolean } | null {
